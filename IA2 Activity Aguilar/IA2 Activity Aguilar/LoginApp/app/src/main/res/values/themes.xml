@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.LoginApp" parent="Theme.AppCompat.Light.NoActionBar" />
+</resources>
