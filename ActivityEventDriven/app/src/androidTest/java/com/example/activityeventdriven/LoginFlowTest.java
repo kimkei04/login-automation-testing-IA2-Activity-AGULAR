@@ -141,8 +141,17 @@ public class LoginFlowTest {
         waitForDialog("Verification Successful");
         tapDialogButton();
 
-        // ---- 4. Users page ----
-        log("Checking the Users page");
+        // ---- 4. Dashboard ----
+        log("Checking the Dashboard");
+        waitForView(withId(R.id.tv_dashboard_title));
+        onView(withId(R.id.tv_dashboard_title)).check(matches(withText("Dashboard")));
+        onView(withId(R.id.btn_customers)).check(matches(isDisplayed()));
+        onView(withId(R.id.btn_users)).check(matches(isDisplayed()));
+        onView(withId(R.id.btn_logout)).check(matches(isDisplayed()));
+
+        // ---- 5. Users page ----
+        log("Opening the Users page");
+        onView(withId(R.id.btn_users)).perform(click());
         waitForView(withId(R.id.tv_users_title));
         onView(withId(R.id.tv_users_title)).check(matches(withText("Users")));
 
@@ -152,14 +161,18 @@ public class LoginFlowTest {
         onView(allOf(withText(VALID_EMAIL), isDescendantOfA(withId(R.id.lv_api_users))))
                 .check(matches(isDisplayed()));
 
-        // ---- 5. Logout ----
+        log("Tapping Back to Dashboard");
+        onView(withId(R.id.btn_back_dashboard)).perform(click());
+        waitForView(withId(R.id.tv_dashboard_title));
+
+        // ---- 6. Logout (from the Dashboard) ----
         log("Tapping Logout");
         onView(withId(R.id.btn_logout)).perform(click());
         waitForView(withId(R.id.btn_login));
-        log("PASSED - valid login reached the Users page");
+        log("PASSED - valid login reached the Dashboard and the Users page");
     }
 
-    // ================= SCENARIO 3: OTP TESTS (NEW) =================
+    // ================= SCENARIO 3: OTP TESTS =================
 
     // 3a. A wrong OTP must be rejected
     @Test
@@ -266,15 +279,75 @@ public class LoginFlowTest {
         waitForDialog("Verification Successful");
         tapDialogButton();
 
-        waitForView(withId(R.id.tv_users_title));
-        onView(withId(R.id.tv_users_title)).check(matches(withText("Users")));
+        waitForView(withId(R.id.tv_dashboard_title));
+        onView(withId(R.id.tv_dashboard_title)).check(matches(withText("Dashboard")));
         log("PASSED - new OTP worked after Resend");
 
         onView(withId(R.id.btn_logout)).perform(click());
         waitForView(withId(R.id.btn_login));
     }
 
+    // ================= SCENARIO 4: DASHBOARD + CUSTOMERS (NEW) =================
+
+    // 4a. The Customers page opens from the Dashboard and loads the Supabase list
+    @Test
+    public void scenario4a_dashboard_customerList() {
+        log("SCENARIO 4a: CUSTOMER LIST");
+
+        loginToDashboard();
+
+        log("Opening the Customers page");
+        onView(withId(R.id.btn_customers)).perform(click());
+        waitForView(withId(R.id.tv_customers_title));
+        onView(withId(R.id.tv_customers_title)).check(matches(withText("Customers")));
+
+        log("Waiting for the customer list to load from Supabase");
+        waitForView(allOf(withId(R.id.tv_customer_header), withSubstring("Customers:")));
+
+        onView(withId(R.id.btn_customers_back)).perform(click());
+        waitForView(withId(R.id.tv_dashboard_title));
+        onView(withId(R.id.btn_logout)).perform(click());
+        waitForView(withId(R.id.btn_login));
+        log("PASSED - customer list loaded");
+    }
+
+    // 4b. The Add Customer form must complain when a field is empty (nothing is sent)
+    @Test
+    public void scenario4b_addCustomer_validation() {
+        log("SCENARIO 4b: ADD CUSTOMER VALIDATION");
+
+        loginToDashboard();
+        onView(withId(R.id.btn_customers)).perform(click());
+        waitForView(withId(R.id.btn_add_customer));
+
+        log("Opening the Add Customer form");
+        onView(withId(R.id.btn_add_customer)).perform(click());
+        waitForDialog("Add Customer");
+
+        log("Tapping Save with every field empty");
+        onView(withId(android.R.id.button1)).inRoot(isDialog()).perform(click());
+        onView(withId(R.id.et_customer_id)).inRoot(isDialog())
+                .check(matches(hasErrorText("Customer ID is required")));
+        log("PASSED - empty form was blocked");
+
+        pressBack();   // closes the form
+        waitForView(withId(R.id.btn_customers_back));
+        onView(withId(R.id.btn_customers_back)).perform(click());
+        waitForView(withId(R.id.tv_dashboard_title));
+        onView(withId(R.id.btn_logout)).perform(click());
+        waitForView(withId(R.id.btn_login));
+    }
+
     // ================= HELPER ACTIONS =================
+
+    // NEW: logs in with the valid user, passes the OTP, and waits on the Dashboard
+    private void loginToDashboard() {
+        String otp = reachOtpPage();
+        enterOtpAndVerify(otp);
+        waitForDialog("Verification Successful");
+        tapDialogButton();
+        waitForView(withId(R.id.tv_dashboard_title));
+    }
 
     // Types the email and password, then taps Login
     private void doLogin(String email, String password) {
@@ -286,7 +359,7 @@ public class LoginFlowTest {
         onView(withId(R.id.btn_login)).perform(click());
     }
 
-    // NEW: logs in with the valid user and gets to the OTP page; returns the OTP shown in the popup
+    // Logs in with the valid user and gets to the OTP page; returns the OTP shown in the popup
     private String reachOtpPage() {
         doLogin(VALID_EMAIL, VALID_PASSWORD);
 
@@ -302,7 +375,7 @@ public class LoginFlowTest {
         return otp;
     }
 
-    // NEW: reads the 4-digit OTP from the popup message
+    // Reads the 4-digit OTP from the popup message
     private String readOtpFromDialog() {
         String otpMessage = dialogMessage();
         log("Popup message: " + otpMessage.replace("\n", " "));
@@ -311,18 +384,18 @@ public class LoginFlowTest {
         return m.group(1);
     }
 
-    // NEW: types an OTP into the OTP box and taps Verify
+    // Types an OTP into the OTP box and taps Verify
     private void enterOtpAndVerify(String otp) {
         onView(withId(R.id.et_otp)).perform(replaceText(otp), closeSoftKeyboard());
         onView(withId(R.id.btn_verify)).perform(click());
     }
 
-    // NEW: makes a 4-digit code that is different from the real OTP
+    // Makes a 4-digit code that is different from the real OTP
     private String differentOtp(String otp) {
         return otp.equals("1234") ? "4321" : "1234";
     }
 
-    // NEW: goes back from the OTP page to the Login page
+    // Goes back from the OTP page to the Login page
     private void leaveOtpPage() {
         pressBack();
         waitForView(withId(R.id.btn_login));

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_customers_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Customers"
+        android:textSize="45sp"
+        android:fontFamily="@font/indigo_daisy"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tv_customer_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Customers"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/roboto_regular"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp" />
+
+    <ListView
+        android:id="@+id/lv_customers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/btn_add_customer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
+        android:textColor="@android:color/white"
+        android:text="Add Customer" />
+
+    <Button
+        android:id="@+id/btn_customers_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/btn_custom"
+        android:fontFamily="@font/roboto_regular"
+        android:textColor="@android:color/white"
+        android:text="Back to Dashboard" />
+
+</LinearLayout>

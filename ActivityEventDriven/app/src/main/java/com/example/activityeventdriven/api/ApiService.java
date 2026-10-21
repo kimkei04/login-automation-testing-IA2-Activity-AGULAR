@@ -14,7 +14,12 @@ public interface ApiService {
     @POST("register")
     Call<AuthResponse> register(@Body RegisterRequest request);
 
-    // NEW: gets the list of users from the Render API
     @GET("users")
     Call<List<UserItem>> getUsers();
+
+    @GET("customers")
+    Call<List<CustomerItem>> getCustomers();
+
+    @POST("customers")
+    Call<AuthResponse> addCustomer(@Body CustomerItem customer);
 }

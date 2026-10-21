@@ -28,7 +28,6 @@ public class OtpActivity extends AppCompatActivity {
 
         String firstName = getIntent().getStringExtra("firstName");
 
-        // Make an OTP as soon as this screen opens (not again if the screen rotates)
         if (savedInstanceState == null) {
             sendNewOtp();
         }
@@ -41,7 +40,6 @@ public class OtpActivity extends AppCompatActivity {
                 return;
             }
 
-            // Check expiry first
             if (OtpStore.isExpired()) {
                 etOtp.setText("");
                 new AlertDialog.Builder(this)
@@ -60,8 +58,10 @@ public class OtpActivity extends AppCompatActivity {
                         .setMessage("Welcome, " + (firstName == null ? "" : firstName) + "! You are now logged in.")
                         .setCancelable(false)
                         .setPositiveButton("OK", (d, w) -> {
-                            // NEW: open the Users page, and close the OTP page
-                            startActivity(new Intent(this, UserListActivity.class));
+                            // Open the Dashboard (main menu), and close the OTP page
+                            Intent intent = new Intent(this, DashboardActivity.class);
+                            intent.putExtra("firstName", firstName);
+                            startActivity(intent);
                             finish();
                         })
                         .show();
@@ -78,7 +78,6 @@ public class OtpActivity extends AppCompatActivity {
         tvResend.setOnClickListener(v -> sendNewOtp());
     }
 
-    // Generates a new random OTP, stores it in memory, shows it, and starts the 30s countdown
     private void sendNewOtp() {
         String otp = OtpStore.generate();
         startTimer();
@@ -89,7 +88,6 @@ public class OtpActivity extends AppCompatActivity {
                 .show();
     }
 
-    // Counts down from 30 seconds and shows it on screen
     private void startTimer() {
         if (timer != null) timer.cancel();
 

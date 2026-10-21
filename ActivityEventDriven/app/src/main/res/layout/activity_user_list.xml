@@ -49,13 +49,13 @@
         android:layout_weight="1" />
 
     <Button
-        android:id="@+id/btn_logout"
+        android:id="@+id/btn_back_dashboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:background="@drawable/btn_custom"
         android:fontFamily="@font/roboto_regular"
         android:textColor="@android:color/white"
-        android:text="Logout" />
+        android:text="Back to Dashboard" />
 
 </LinearLayout>

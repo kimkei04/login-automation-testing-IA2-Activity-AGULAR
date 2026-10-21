@@ -20,7 +20,13 @@
             android:name=".OtpActivity"
             android:exported="false" />
         <activity
+            android:name=".DashboardActivity"
+            android:exported="false" />
+        <activity
             android:name=".UserListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerListActivity"
             android:exported="false" />
     </application>
 

@@ -1,6 +1,5 @@
 package com.example.activityeventdriven;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,28 +40,20 @@ public class UserListActivity extends AppCompatActivity {
         TextView tvLocalHeader = findViewById(R.id.tv_local_header);
         ListView lvApi = findViewById(R.id.lv_api_users);
         ListView lvLocal = findViewById(R.id.lv_local_users);
-        Button btnLogout = findViewById(R.id.btn_logout);
+        Button btnBack = findViewById(R.id.btn_back_dashboard);
 
-        // ---- List 1: users from the Render API ----
         apiAdapter = makeAdapter(apiUsers);
         lvApi.setAdapter(apiAdapter);
         loadApiUsers();
 
-        // ---- List 2: users saved on the phone (SharedPreferences) ----
         List<UserItem> localUsers = loadLocalUsers();
         lvLocal.setAdapter(makeAdapter(localUsers));
         tvLocalHeader.setText("Saved on this phone (SharedPreferences): " + localUsers.size());
 
-        // ---- Logout goes back to the Login screen ----
-        btnLogout.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+        // Back goes to the Dashboard (logout now lives there)
+        btnBack.setOnClickListener(v -> finish());
     }
 
-    // Loads the user list from the Render API
     private void loadApiUsers() {
         tvApiHeader.setText("Loading users from Render... (may take a moment)");
 
@@ -88,7 +79,6 @@ public class UserListActivity extends AppCompatActivity {
         });
     }
 
-    // Reads the users saved in SharedPreferences
     private List<UserItem> loadLocalUsers() {
         List<UserItem> list = new ArrayList<>();
         JSONArray array = LocalUserStore.getUsers(this);
@@ -104,7 +94,6 @@ public class UserListActivity extends AppCompatActivity {
         return list;
     }
 
-    // Shows each user as: name (big) + email (small)
     private ArrayAdapter<UserItem> makeAdapter(List<UserItem> list) {
         return new ArrayAdapter<UserItem>(this, android.R.layout.simple_list_item_2,
                 android.R.id.text1, list) {
